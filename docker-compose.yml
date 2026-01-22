@@ -1,0 +1,16 @@
+services:
+  db:
+    image: postgres:16
+    container_name: devmanager_db
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: devmanager
+      POSTGRES_PASSWORD: devmanager
+      POSTGRES_DB: devmanager
+    volumes:
+      - devmanager_data:/var/lib/postgresql/data
+
+volumes:
+  devmanager_data:
