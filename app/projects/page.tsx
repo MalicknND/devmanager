@@ -33,7 +33,19 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
-import { Plus, Search, Edit, Trash2, Filter } from 'lucide-react'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog'
+import { TableSkeleton, LoadingSpinner } from '@/components/ui/loading'
+import { Plus, Search, Edit, Trash2, Filter, Loader2 } from 'lucide-react'
 import { format } from 'date-fns'
 import { fr } from 'date-fns/locale/fr'
 
@@ -156,12 +168,10 @@ function ProjectsContent() {
   }
 
   const handleDelete = async (id: string) => {
-    if (confirm('Êtes-vous sûr de vouloir supprimer ce projet ?')) {
-      try {
-        await deleteProject.mutateAsync(id)
-      } catch (error) {
-        console.error('Error deleting project:', error)
-      }
+    try {
+      await deleteProject.mutateAsync(id)
+    } catch (error) {
+      // Error is handled by the hook's onError
     }
   }
 
@@ -300,6 +310,9 @@ function ProjectsContent() {
                     type="submit"
                     disabled={createProject.isPending || updateProject.isPending}
                   >
+                    {(createProject.isPending || updateProject.isPending) && (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    )}
                     {editingProject ? 'Modifier' : 'Créer'}
                   </Button>
                 </div>
@@ -338,7 +351,7 @@ function ProjectsContent() {
 
         {/* Projects Grid */}
         {isLoading ? (
-          <div className="py-12 text-center text-muted-foreground">Chargement...</div>
+          <TableSkeleton rows={6} />
         ) : filteredProjects.length === 0 ? (
           <Card className="glass-card">
             <CardContent className="py-12 text-center">
@@ -398,13 +411,39 @@ function ProjectsContent() {
                       <Edit className="mr-2 h-4 w-4" />
                       Modifier
                     </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleDelete(project.id)}
-                    >
-                      <Trash2 className="h-4 w-4 text-destructive" />
-                    </Button>
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          disabled={deleteProject.isPending}
+                        >
+                          {deleteProject.isPending ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <Trash2 className="h-4 w-4 text-destructive" />
+                          )}
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Supprimer le projet</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Êtes-vous sûr de vouloir supprimer ce projet ? Cette action est
+                            irréversible.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Annuler</AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={() => handleDelete(project.id)}
+                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                          >
+                            Supprimer
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
                   </div>
                 </CardContent>
               </Card>

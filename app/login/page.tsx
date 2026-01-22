@@ -8,6 +8,8 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { toast } from 'sonner'
+import { Loader2 } from 'lucide-react'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -30,10 +32,15 @@ export default function LoginPage() {
 
       if (error) throw error
 
+      toast.success('Connexion réussie')
       router.push('/dashboard')
       router.refresh()
     } catch (error: any) {
-      setError(error.message || 'Une erreur est survenue')
+      const errorMessage = error.message || 'Une erreur est survenue'
+      setError(errorMessage)
+      toast.error('Erreur de connexion', {
+        description: errorMessage,
+      })
     } finally {
       setLoading(false)
     }
@@ -77,6 +84,7 @@ export default function LoginPage() {
               />
             </div>
             <Button type="submit" className="w-full" disabled={loading}>
+              {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               {loading ? 'Connexion...' : 'Se connecter'}
             </Button>
           </form>

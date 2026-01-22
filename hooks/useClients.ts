@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { createClient } from '@/lib/supabase/client'
 import { useAuth } from '@/contexts/AuthContext'
+import { toast } from 'sonner'
 
 export interface Client {
   id: string
@@ -55,6 +56,12 @@ export function useCreateClient() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['clients', user?.id] })
+      toast.success('Client créé avec succès')
+    },
+    onError: (error: Error) => {
+      toast.error('Erreur lors de la création du client', {
+        description: error.message,
+      })
     },
   })
 }
@@ -80,6 +87,12 @@ export function useUpdateClient() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['clients', user?.id] })
+      toast.success('Client modifié avec succès')
+    },
+    onError: (error: Error) => {
+      toast.error('Erreur lors de la modification du client', {
+        description: error.message,
+      })
     },
   })
 }
@@ -102,6 +115,12 @@ export function useDeleteClient() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['clients', user?.id] })
+      toast.success('Client supprimé avec succès')
+    },
+    onError: (error: Error) => {
+      toast.error('Erreur lors de la suppression du client', {
+        description: error.message,
+      })
     },
   })
 }

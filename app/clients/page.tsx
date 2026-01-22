@@ -23,7 +23,19 @@ import {
 } from '@/components/ui/dialog'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Textarea } from '@/components/ui/textarea'
-import { Plus, Search, Edit, Trash2, Mail, Phone, Building } from 'lucide-react'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog'
+import { TableSkeleton, LoadingSpinner } from '@/components/ui/loading'
+import { Plus, Search, Edit, Trash2, Mail, Phone, Building, Loader2 } from 'lucide-react'
 
 function ClientsContent() {
   const { data: clients, isLoading } = useClients()
@@ -106,12 +118,10 @@ function ClientsContent() {
   }
 
   const handleDelete = async (id: string) => {
-    if (confirm('Êtes-vous sûr de vouloir supprimer ce client ?')) {
-      try {
-        await deleteClient.mutateAsync(id)
-      } catch (error) {
-        console.error('Error deleting client:', error)
-      }
+    try {
+      await deleteClient.mutateAsync(id)
+    } catch (error) {
+      // Error is handled by the hook's onError
     }
   }
 
@@ -211,7 +221,13 @@ function ClientsContent() {
                   <Button type="button" variant="outline" onClick={handleCloseDialog}>
                     Annuler
                   </Button>
-                  <Button type="submit" disabled={createClient.isPending || updateClient.isPending}>
+                  <Button
+                    type="submit"
+                    disabled={createClient.isPending || updateClient.isPending}
+                  >
+                    {(createClient.isPending || updateClient.isPending) && (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    )}
                     {editingClient ? 'Modifier' : 'Créer'}
                   </Button>
                 </div>
@@ -233,7 +249,7 @@ function ClientsContent() {
 
         {/* Clients Grid */}
         {isLoading ? (
-          <div className="py-12 text-center text-muted-foreground">Chargement...</div>
+          <TableSkeleton rows={6} />
         ) : filteredClients.length === 0 ? (
           <Card className="glass-card">
             <CardContent className="py-12 text-center">
@@ -259,13 +275,35 @@ function ClientsContent() {
                       >
                         <Edit className="h-4 w-4" />
                       </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleDelete(client.id)}
-                      >
-                        <Trash2 className="h-4 w-4 text-destructive" />
-                      </Button>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button variant="ghost" size="icon" disabled={deleteClient.isPending}>
+                            {deleteClient.isPending ? (
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                              <Trash2 className="h-4 w-4 text-destructive" />
+                            )}
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Supprimer le client</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Êtes-vous sûr de vouloir supprimer ce client ? Cette action est
+                              irréversible et supprimera également tous les projets associés.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Annuler</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => handleDelete(client.id)}
+                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                            >
+                              Supprimer
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
                     </div>
                   </div>
                 </CardHeader>

@@ -6,6 +6,8 @@ import { useProjects } from '@/hooks/useProjects'
 import { useClients } from '@/hooks/useClients'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { CardSkeleton, LoadingSpinner } from '@/components/ui/loading'
+import { Skeleton } from '@/components/ui/skeleton'
 import {
   Users,
   FolderKanban,
@@ -83,7 +85,16 @@ function DashboardContent() {
 
         {/* Stats Grid */}
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          <Card className="glass-card">
+          {projectsLoading ? (
+            <>
+              <CardSkeleton />
+              <CardSkeleton />
+              <CardSkeleton />
+              <CardSkeleton />
+            </>
+          ) : (
+            <>
+              <Card className="glass-card">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">
                 Total Projects
@@ -138,6 +149,8 @@ function DashboardContent() {
               <div className="text-3xl font-bold">{clients?.length || 0}</div>
             </CardContent>
           </Card>
+            </>
+          )}
         </div>
 
         {/* Bottom Grid */}
@@ -158,8 +171,16 @@ function DashboardContent() {
             </CardHeader>
             <CardContent>
               {projectsLoading ? (
-                <div className="py-8 text-center text-muted-foreground">
-                  Chargement...
+                <div className="space-y-3">
+                  {Array.from({ length: 3 }).map((_, i) => (
+                    <div key={i} className="flex items-center gap-3 rounded-lg border border-border/50 p-3">
+                      <Skeleton className="h-10 w-10 rounded-lg" />
+                      <div className="flex-1 space-y-2">
+                        <Skeleton className="h-4 w-32" />
+                        <Skeleton className="h-3 w-24" />
+                      </div>
+                    </div>
+                  ))}
                 </div>
               ) : recentProjects.length === 0 ? (
                 <div className="py-8 text-center text-muted-foreground">

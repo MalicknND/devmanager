@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { createClient } from '@/lib/supabase/client'
 import { useAuth } from '@/contexts/AuthContext'
+import { toast } from 'sonner'
 
 export type ProjectStatus = 'in_progress' | 'completed' | 'paused'
 
@@ -69,6 +70,12 @@ export function useCreateProject() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['projects', user?.id] })
+      toast.success('Projet créé avec succès')
+    },
+    onError: (error: Error) => {
+      toast.error('Erreur lors de la création du projet', {
+        description: error.message,
+      })
     },
   })
 }
@@ -94,6 +101,12 @@ export function useUpdateProject() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['projects', user?.id] })
+      toast.success('Projet modifié avec succès')
+    },
+    onError: (error: Error) => {
+      toast.error('Erreur lors de la modification du projet', {
+        description: error.message,
+      })
     },
   })
 }
@@ -116,6 +129,12 @@ export function useDeleteProject() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['projects', user?.id] })
+      toast.success('Projet supprimé avec succès')
+    },
+    onError: (error: Error) => {
+      toast.error('Erreur lors de la suppression du projet', {
+        description: error.message,
+      })
     },
   })
 }
