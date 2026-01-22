@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute'
 import { AppLayout } from '@/components/layout/AppLayout'
 import {
@@ -14,7 +14,6 @@ import {
 import { useClients } from '@/hooks/useClients'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import {
   Select,
   SelectContent,
@@ -31,8 +30,11 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
+import { ProjectForm } from '@/components/forms/project-form'
+import { usePagination } from '@/hooks/usePagination'
+import { Pagination } from '@/components/ui/pagination'
+import type { ProjectFormData } from '@/lib/validations'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -61,23 +63,33 @@ function ProjectsContent() {
   const [searchQuery, setSearchQuery] = useState('')
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingProject, setEditingProject] = useState<Project | null>(null)
-  const [formData, setFormData] = useState({
-    name: '',
-    description: '',
-    status: 'in_progress' as ProjectStatus,
-    client_id: '',
-    start_date: '',
-    end_date: '',
-    budget: '',
-  })
 
-  const filteredProjects =
-    projects?.filter(
-      (project) =>
-        project.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        project.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        project.clients?.name.toLowerCase().includes(searchQuery.toLowerCase())
-    ) || []
+  const filteredProjects = useMemo(
+    () =>
+      projects?.filter(
+        (project) =>
+          project.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          project.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          project.clients?.name.toLowerCase().includes(searchQuery.toLowerCase())
+      ) || [],
+    [projects, searchQuery]
+  )
+
+  const {
+    currentPage,
+    totalPages,
+    paginatedItems,
+    goToPage,
+    nextPage,
+    previousPage,
+    hasNextPage,
+    hasPreviousPage,
+    reset: resetPagination,
+  } = usePagination(filteredProjects, 12)
+
+  useEffect(() => {
+    resetPagination()
+  }, [searchQuery, statusFilter, resetPagination])
 
   const getStatusBadge = (status: ProjectStatus) => {
     const variants: Record<ProjectStatus, 'default' | 'secondary' | 'destructive'> = {
@@ -96,75 +108,35 @@ function ProjectsContent() {
   }
 
   const handleOpenDialog = (project?: Project) => {
-    if (project) {
-      setEditingProject(project)
-      setFormData({
-        name: project.name,
-        description: project.description || '',
-        status: project.status,
-        client_id: project.client_id,
-        start_date: project.start_date
-          ? format(new Date(project.start_date), 'yyyy-MM-dd')
-          : '',
-        end_date: project.end_date
-          ? format(new Date(project.end_date), 'yyyy-MM-dd')
-          : '',
-        budget: project.budget?.toString() || '',
-      })
-    } else {
-      setEditingProject(null)
-      setFormData({
-        name: '',
-        description: '',
-        status: 'in_progress',
-        client_id: '',
-        start_date: '',
-        end_date: '',
-        budget: '',
-      })
-    }
+    setEditingProject(project || null)
     setIsDialogOpen(true)
   }
 
   const handleCloseDialog = () => {
     setIsDialogOpen(false)
     setEditingProject(null)
-    setFormData({
-      name: '',
-      description: '',
-      status: 'in_progress',
-      client_id: '',
-      start_date: '',
-      end_date: '',
-      budget: '',
-    })
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    try {
-      const projectData = {
-        name: formData.name,
-        description: formData.description || null,
-        status: formData.status,
-        client_id: formData.client_id,
-        start_date: formData.start_date || null,
-        end_date: formData.end_date || null,
-        budget: formData.budget ? parseFloat(formData.budget) : null,
-      }
-
-      if (editingProject) {
-        await updateProject.mutateAsync({
-          id: editingProject.id,
-          ...projectData,
-        })
-      } else {
-        await createProject.mutateAsync(projectData)
-      }
-      handleCloseDialog()
-    } catch (error) {
-      console.error('Error saving project:', error)
+  const handleSubmit = async (data: ProjectFormData) => {
+    const projectData = {
+      name: data.name,
+      description: data.description || null,
+      status: data.status,
+      client_id: data.client_id,
+      start_date: data.start_date || null,
+      end_date: data.end_date || null,
+      budget: data.budget ? parseFloat(data.budget) : null,
     }
+
+    if (editingProject) {
+      await updateProject.mutateAsync({
+        id: editingProject.id,
+        ...projectData,
+      })
+    } else {
+      await createProject.mutateAsync(projectData)
+    }
+    handleCloseDialog()
   }
 
   const handleDelete = async (id: string) => {
@@ -203,120 +175,31 @@ function ProjectsContent() {
                     : 'Créez un nouveau projet'}
                 </DialogDescription>
               </DialogHeader>
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="name">Nom du projet *</Label>
-                  <Input
-                    id="name"
-                    value={formData.name}
-                    onChange={(e) =>
-                      setFormData({ ...formData, name: e.target.value })
-                    }
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="client_id">Client *</Label>
-                  <Select
-                    value={formData.client_id}
-                    onValueChange={(value) =>
-                      setFormData({ ...formData, client_id: value })
-                    }
-                    required
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Sélectionner un client" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {clients?.map((client) => (
-                        <SelectItem key={client.id} value={client.id}>
-                          {client.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="description">Description</Label>
-                  <Textarea
-                    id="description"
-                    value={formData.description}
-                    onChange={(e) =>
-                      setFormData({ ...formData, description: e.target.value })
-                    }
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="status">Statut *</Label>
-                    <Select
-                      value={formData.status}
-                      onValueChange={(value: ProjectStatus) =>
-                        setFormData({ ...formData, status: value })
-                      }
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="in_progress">En cours</SelectItem>
-                        <SelectItem value="completed">Terminé</SelectItem>
-                        <SelectItem value="paused">En pause</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="budget">Budget (€)</Label>
-                    <Input
-                      id="budget"
-                      type="number"
-                      step="0.01"
-                      value={formData.budget}
-                      onChange={(e) =>
-                        setFormData({ ...formData, budget: e.target.value })
-                      }
-                    />
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="start_date">Date de début</Label>
-                    <Input
-                      id="start_date"
-                      type="date"
-                      value={formData.start_date}
-                      onChange={(e) =>
-                        setFormData({ ...formData, start_date: e.target.value })
-                      }
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="end_date">Date de fin</Label>
-                    <Input
-                      id="end_date"
-                      type="date"
-                      value={formData.end_date}
-                      onChange={(e) =>
-                        setFormData({ ...formData, end_date: e.target.value })
-                      }
-                    />
-                  </div>
-                </div>
-                <div className="flex justify-end gap-2">
-                  <Button type="button" variant="outline" onClick={handleCloseDialog}>
-                    Annuler
-                  </Button>
-                  <Button
-                    type="submit"
-                    disabled={createProject.isPending || updateProject.isPending}
-                  >
-                    {(createProject.isPending || updateProject.isPending) && (
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    )}
-                    {editingProject ? 'Modifier' : 'Créer'}
-                  </Button>
-                </div>
-              </form>
+              {clients && (
+                <ProjectForm
+                  defaultValues={
+                    editingProject
+                      ? {
+                          name: editingProject.name,
+                          description: editingProject.description || '',
+                          status: editingProject.status,
+                          client_id: editingProject.client_id,
+                          start_date: editingProject.start_date
+                            ? format(new Date(editingProject.start_date), 'yyyy-MM-dd')
+                            : '',
+                          end_date: editingProject.end_date
+                            ? format(new Date(editingProject.end_date), 'yyyy-MM-dd')
+                            : '',
+                          budget: editingProject.budget?.toString() || '',
+                        }
+                      : undefined
+                  }
+                  clients={clients}
+                  onSubmit={handleSubmit}
+                  onCancel={handleCloseDialog}
+                  isLoading={createProject.isPending || updateProject.isPending}
+                />
+              )}
             </DialogContent>
           </Dialog>
         </div>
@@ -363,8 +246,9 @@ function ProjectsContent() {
             </CardContent>
           </Card>
         ) : (
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {filteredProjects.map((project) => (
+          <>
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {paginatedItems.map((project) => (
               <Card key={project.id} className="glass-card">
                 <CardHeader>
                   <div className="flex items-start justify-between">
@@ -447,8 +331,22 @@ function ProjectsContent() {
                   </div>
                 </CardContent>
               </Card>
-            ))}
-          </div>
+              ))}
+            </div>
+            {totalPages > 1 && (
+              <div className="mt-6">
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={goToPage}
+                  onPrevious={previousPage}
+                  onNext={nextPage}
+                  hasPrevious={hasPreviousPage}
+                  hasNext={hasNextPage}
+                />
+              </div>
+            )}
+          </>
         )}
       </div>
     </AppLayout>

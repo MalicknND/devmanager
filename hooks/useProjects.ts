@@ -68,14 +68,39 @@ export function useCreateProject() {
       if (error) throw error
       return data as Project
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['projects', user?.id] })
-      toast.success('Projet créé avec succès')
+    onMutate: async (newProject) => {
+      if (!user) return
+
+      await queryClient.cancelQueries({ queryKey: ['projects', user.id] })
+
+      const previousProjects = queryClient.getQueryData<Project[]>(['projects', user.id])
+
+      const optimisticProject: Project = {
+        id: `temp-${Date.now()}`,
+        user_id: user.id,
+        ...newProject,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      }
+
+      queryClient.setQueryData<Project[]>(['projects', user.id], (old = []) => [
+        optimisticProject,
+        ...old,
+      ])
+
+      return { previousProjects }
     },
-    onError: (error: Error) => {
+    onError: (error, _newProject, context) => {
+      if (context?.previousProjects && user) {
+        queryClient.setQueryData(['projects', user.id], context.previousProjects)
+      }
       toast.error('Erreur lors de la création du projet', {
         description: error.message,
       })
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['projects', user?.id] })
+      toast.success('Projet créé avec succès')
     },
   })
 }
@@ -99,14 +124,34 @@ export function useUpdateProject() {
       if (error) throw error
       return data as Project
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['projects', user?.id] })
-      toast.success('Projet modifié avec succès')
+    onMutate: async ({ id, ...updates }) => {
+      if (!user) return
+
+      await queryClient.cancelQueries({ queryKey: ['projects', user.id] })
+
+      const previousProjects = queryClient.getQueryData<Project[]>(['projects', user.id])
+
+      queryClient.setQueryData<Project[]>(['projects', user.id], (old = []) =>
+        old.map((project) =>
+          project.id === id
+            ? { ...project, ...updates, updated_at: new Date().toISOString() }
+            : project
+        )
+      )
+
+      return { previousProjects }
     },
-    onError: (error: Error) => {
+    onError: (error, _variables, context) => {
+      if (context?.previousProjects && user) {
+        queryClient.setQueryData(['projects', user.id], context.previousProjects)
+      }
       toast.error('Erreur lors de la modification du projet', {
         description: error.message,
       })
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['projects', user?.id] })
+      toast.success('Projet modifié avec succès')
     },
   })
 }
@@ -127,14 +172,30 @@ export function useDeleteProject() {
 
       if (error) throw error
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['projects', user?.id] })
-      toast.success('Projet supprimé avec succès')
+    onMutate: async (id) => {
+      if (!user) return
+
+      await queryClient.cancelQueries({ queryKey: ['projects', user.id] })
+
+      const previousProjects = queryClient.getQueryData<Project[]>(['projects', user.id])
+
+      queryClient.setQueryData<Project[]>(['projects', user.id], (old = []) =>
+        old.filter((project) => project.id !== id)
+      )
+
+      return { previousProjects }
     },
-    onError: (error: Error) => {
+    onError: (error, _id, context) => {
+      if (context?.previousProjects && user) {
+        queryClient.setQueryData(['projects', user.id], context.previousProjects)
+      }
       toast.error('Erreur lors de la suppression du projet', {
         description: error.message,
       })
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['projects', user?.id] })
+      toast.success('Projet supprimé avec succès')
     },
   })
 }

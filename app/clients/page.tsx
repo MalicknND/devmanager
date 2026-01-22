@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute'
 import { AppLayout } from '@/components/layout/AppLayout'
 import {
@@ -12,7 +12,6 @@ import {
 } from '@/hooks/useClients'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import {
   Dialog,
   DialogContent,
@@ -22,7 +21,10 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Textarea } from '@/components/ui/textarea'
+import { ClientForm } from '@/components/forms/client-form'
+import { usePagination } from '@/hooks/usePagination'
+import { Pagination } from '@/components/ui/pagination'
+import type { ClientFormData } from '@/lib/validations'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -45,76 +47,55 @@ function ClientsContent() {
   const [searchQuery, setSearchQuery] = useState('')
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingClient, setEditingClient] = useState<Client | null>(null)
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    company: '',
-    address: '',
-    notes: '',
-  })
 
-  const filteredClients =
-    clients?.filter(
-      (client) =>
-        client.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        client.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        client.company?.toLowerCase().includes(searchQuery.toLowerCase())
-    ) || []
+  const filteredClients = useMemo(
+    () =>
+      clients?.filter(
+        (client) =>
+          client.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          client.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          client.company?.toLowerCase().includes(searchQuery.toLowerCase())
+      ) || [],
+    [clients, searchQuery]
+  )
+
+  const {
+    currentPage,
+    totalPages,
+    paginatedItems,
+    goToPage,
+    nextPage,
+    previousPage,
+    hasNextPage,
+    hasPreviousPage,
+    reset: resetPagination,
+  } = usePagination(filteredClients, 12)
+
+  // Reset pagination when search changes
+  useEffect(() => {
+    resetPagination()
+  }, [searchQuery, resetPagination])
 
   const handleOpenDialog = (client?: Client) => {
-    if (client) {
-      setEditingClient(client)
-      setFormData({
-        name: client.name,
-        email: client.email || '',
-        phone: client.phone || '',
-        company: client.company || '',
-        address: client.address || '',
-        notes: client.notes || '',
-      })
-    } else {
-      setEditingClient(null)
-      setFormData({
-        name: '',
-        email: '',
-        phone: '',
-        company: '',
-        address: '',
-        notes: '',
-      })
-    }
+    setEditingClient(client || null)
     setIsDialogOpen(true)
   }
 
   const handleCloseDialog = () => {
     setIsDialogOpen(false)
     setEditingClient(null)
-    setFormData({
-      name: '',
-      email: '',
-      phone: '',
-      company: '',
-      address: '',
-      notes: '',
-    })
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    try {
-      if (editingClient) {
-        await updateClient.mutateAsync({
-          id: editingClient.id,
-          ...formData,
-        })
-      } else {
-        await createClient.mutateAsync(formData)
-      }
-      handleCloseDialog()
-    } catch (error) {
-      console.error('Error saving client:', error)
+  const handleSubmit = async (data: ClientFormData) => {
+    if (editingClient) {
+      await updateClient.mutateAsync({
+        id: editingClient.id,
+        ...data,
+      })
+    } else {
+      await createClient.mutateAsync(data)
     }
+    handleCloseDialog()
   }
 
   const handleDelete = async (id: string) => {
@@ -153,85 +134,23 @@ function ClientsContent() {
                     : 'Ajoutez un nouveau client à votre liste'}
                 </DialogDescription>
               </DialogHeader>
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="name">Nom *</Label>
-                  <Input
-                    id="name"
-                    value={formData.name}
-                    onChange={(e) =>
-                      setFormData({ ...formData, name: e.target.value })
-                    }
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) =>
-                      setFormData({ ...formData, email: e.target.value })
-                    }
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="phone">Téléphone</Label>
-                  <Input
-                    id="phone"
-                    type="tel"
-                    value={formData.phone}
-                    onChange={(e) =>
-                      setFormData({ ...formData, phone: e.target.value })
-                    }
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="company">Entreprise</Label>
-                  <Input
-                    id="company"
-                    value={formData.company}
-                    onChange={(e) =>
-                      setFormData({ ...formData, company: e.target.value })
-                    }
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="address">Adresse</Label>
-                  <Textarea
-                    id="address"
-                    value={formData.address}
-                    onChange={(e) =>
-                      setFormData({ ...formData, address: e.target.value })
-                    }
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="notes">Notes</Label>
-                  <Textarea
-                    id="notes"
-                    value={formData.notes}
-                    onChange={(e) =>
-                      setFormData({ ...formData, notes: e.target.value })
-                    }
-                  />
-                </div>
-                <div className="flex justify-end gap-2">
-                  <Button type="button" variant="outline" onClick={handleCloseDialog}>
-                    Annuler
-                  </Button>
-                  <Button
-                    type="submit"
-                    disabled={createClient.isPending || updateClient.isPending}
-                  >
-                    {(createClient.isPending || updateClient.isPending) && (
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    )}
-                    {editingClient ? 'Modifier' : 'Créer'}
-                  </Button>
-                </div>
-              </form>
+              <ClientForm
+                defaultValues={
+                  editingClient
+                    ? {
+                        name: editingClient.name,
+                        email: editingClient.email || '',
+                        phone: editingClient.phone || '',
+                        company: editingClient.company || '',
+                        address: editingClient.address || '',
+                        notes: editingClient.notes || '',
+                      }
+                    : undefined
+                }
+                onSubmit={handleSubmit}
+                onCancel={handleCloseDialog}
+                isLoading={createClient.isPending || updateClient.isPending}
+              />
             </DialogContent>
           </Dialog>
         </div>
@@ -261,8 +180,9 @@ function ClientsContent() {
             </CardContent>
           </Card>
         ) : (
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {filteredClients.map((client) => (
+          <>
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {paginatedItems.map((client) => (
               <Card key={client.id} className="glass-card">
                 <CardHeader>
                   <div className="flex items-start justify-between">
@@ -333,8 +253,22 @@ function ClientsContent() {
                   )}
                 </CardContent>
               </Card>
-            ))}
-          </div>
+              ))}
+            </div>
+            {totalPages > 1 && (
+              <div className="mt-6">
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={goToPage}
+                  onPrevious={previousPage}
+                  onNext={nextPage}
+                  hasPrevious={hasPreviousPage}
+                  hasNext={hasNextPage}
+                />
+              </div>
+            )}
+          </>
         )}
       </div>
     </AppLayout>

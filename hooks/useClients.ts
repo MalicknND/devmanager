@@ -54,14 +54,42 @@ export function useCreateClient() {
       if (error) throw error
       return data as Client
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['clients', user?.id] })
-      toast.success('Client créé avec succès')
+    onMutate: async (newClient) => {
+      if (!user) return
+
+      // Cancel outgoing refetches
+      await queryClient.cancelQueries({ queryKey: ['clients', user.id] })
+
+      // Snapshot previous value
+      const previousClients = queryClient.getQueryData<Client[]>(['clients', user.id])
+
+      // Optimistically update
+      const optimisticClient: Client = {
+        id: `temp-${Date.now()}`,
+        user_id: user.id,
+        ...newClient,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      }
+
+      queryClient.setQueryData<Client[]>(['clients', user.id], (old = []) => [
+        optimisticClient,
+        ...old,
+      ])
+
+      return { previousClients }
     },
-    onError: (error: Error) => {
+    onError: (error, _newClient, context) => {
+      if (context?.previousClients && user) {
+        queryClient.setQueryData(['clients', user.id], context.previousClients)
+      }
       toast.error('Erreur lors de la création du client', {
         description: error.message,
       })
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['clients', user?.id] })
+      toast.success('Client créé avec succès')
     },
   })
 }
@@ -85,14 +113,34 @@ export function useUpdateClient() {
       if (error) throw error
       return data as Client
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['clients', user?.id] })
-      toast.success('Client modifié avec succès')
+    onMutate: async ({ id, ...updates }) => {
+      if (!user) return
+
+      await queryClient.cancelQueries({ queryKey: ['clients', user.id] })
+
+      const previousClients = queryClient.getQueryData<Client[]>(['clients', user.id])
+
+      queryClient.setQueryData<Client[]>(['clients', user.id], (old = []) =>
+        old.map((client) =>
+          client.id === id
+            ? { ...client, ...updates, updated_at: new Date().toISOString() }
+            : client
+        )
+      )
+
+      return { previousClients }
     },
-    onError: (error: Error) => {
+    onError: (error, _variables, context) => {
+      if (context?.previousClients && user) {
+        queryClient.setQueryData(['clients', user.id], context.previousClients)
+      }
       toast.error('Erreur lors de la modification du client', {
         description: error.message,
       })
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['clients', user?.id] })
+      toast.success('Client modifié avec succès')
     },
   })
 }
@@ -113,14 +161,30 @@ export function useDeleteClient() {
 
       if (error) throw error
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['clients', user?.id] })
-      toast.success('Client supprimé avec succès')
+    onMutate: async (id) => {
+      if (!user) return
+
+      await queryClient.cancelQueries({ queryKey: ['clients', user.id] })
+
+      const previousClients = queryClient.getQueryData<Client[]>(['clients', user.id])
+
+      queryClient.setQueryData<Client[]>(['clients', user.id], (old = []) =>
+        old.filter((client) => client.id !== id)
+      )
+
+      return { previousClients }
     },
-    onError: (error: Error) => {
+    onError: (error, _id, context) => {
+      if (context?.previousClients && user) {
+        queryClient.setQueryData(['clients', user.id], context.previousClients)
+      }
       toast.error('Erreur lors de la suppression du client', {
         description: error.message,
       })
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['clients', user?.id] })
+      toast.success('Client supprimé avec succès')
     },
   })
 }
