@@ -8,13 +8,12 @@ import { Skeleton } from "@/components/ui/skeleton";
 import {
   Users,
   FolderKanban,
-  CheckCircle2,
   Clock,
   TrendingUp,
   ArrowRight,
 } from "lucide-react";
 import Link from "next/link";
-import { format, formatDistanceToNow } from "date-fns";
+import { formatDistanceToNow } from "date-fns";
 import { fr } from "date-fns/locale/fr";
 
 function DashboardContent() {
@@ -284,9 +283,9 @@ function DashboardContent() {
               <div className="space-y-1">
                 <p className="text-sm text-muted-foreground">Total Budget</p>
                 <p className="text-3xl font-bold text-primary">
-                  {new Intl.NumberFormat("en-US", {
+                  {new Intl.NumberFormat("fr-FR", {
                     style: "currency",
-                    currency: "USD",
+                    currency: "EUR",
                     minimumFractionDigits: 0,
                   }).format(totalBudget)}
                 </p>
