@@ -1,22 +1,28 @@
-'use client'
+"use client";
 
-import { useEffect } from 'react'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { AlertTriangle, RefreshCw, Home } from 'lucide-react'
-import Link from 'next/link'
+import { useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { AlertTriangle, RefreshCw, Home } from "lucide-react";
+import Link from "next/link";
 
 export default function Error({
   error,
   reset,
 }: {
-  error: Error & { digest?: string }
-  reset: () => void
+  error: Error & { digest?: string };
+  reset: () => void;
 }) {
   useEffect(() => {
     // Log error to error reporting service
-    console.error('Dashboard error:', error)
-  }, [error])
+    console.error("Dashboard error:", error);
+  }, [error]);
 
   return (
     <div className="flex min-h-[60vh] items-center justify-center">
@@ -29,17 +35,21 @@ export default function Error({
             <div>
               <CardTitle>Une erreur est survenue</CardTitle>
               <CardDescription className="mt-1">
-                Une erreur inattendue s'est produite
+                Une erreur inattendue s&apos;est produite
               </CardDescription>
             </div>
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          {process.env.NODE_ENV === 'development' && (
+          {process.env.NODE_ENV === "development" && (
             <div className="rounded-lg bg-muted p-3">
-              <p className="text-xs font-mono text-destructive">{error.message}</p>
+              <p className="text-xs font-mono text-destructive">
+                {error.message}
+              </p>
               {error.digest && (
-                <p className="mt-1 text-xs text-muted-foreground">Digest: {error.digest}</p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Digest: {error.digest}
+                </p>
               )}
             </div>
           )}
@@ -51,12 +61,12 @@ export default function Error({
             <Button variant="outline" asChild className="flex-1">
               <Link href="/dashboard">
                 <Home className="mr-2 h-4 w-4" />
-                Dashboard
+                Tableau de bord
               </Link>
             </Button>
           </div>
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

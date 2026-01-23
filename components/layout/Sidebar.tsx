@@ -18,7 +18,7 @@ import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
 const navigation = [
-  { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+  { name: 'Tableau de bord', href: '/dashboard', icon: LayoutDashboard },
   { name: 'Clients', href: '/clients', icon: Users },
   { name: 'Projets', href: '/projects', icon: FolderKanban },
   { name: 'Paramètres', href: '/settings', icon: Settings },
@@ -61,7 +61,7 @@ export function Sidebar() {
           </div>
           <div>
             <h1 className="text-lg font-bold text-foreground">DevManager</h1>
-            <p className="text-xs text-muted-foreground">Project Management</p>
+            <p className="text-xs text-muted-foreground">Gestion de projets</p>
           </div>
         </div>
       </div>
@@ -118,7 +118,7 @@ export function Sidebar() {
               {getDisplayName()}
             </p>
             <p className="text-xs text-muted-foreground truncate">{getDisplayEmail()}</p>
-            <p className="text-xs text-muted-foreground">Free Plan</p>
+            <p className="text-xs text-muted-foreground">Plan gratuit</p>
           </div>
         </div>
         <Button
@@ -127,7 +127,7 @@ export function Sidebar() {
           onClick={signOut}
         >
           <ArrowRight className="mr-2 h-4 w-4" />
-          Sign Out
+          Déconnexion
         </Button>
       </div>
     </div>

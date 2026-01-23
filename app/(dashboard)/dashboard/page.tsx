@@ -35,15 +35,15 @@ function DashboardContent() {
   const getStatusBadge = (status: string) => {
     const config: Record<string, { label: string; className: string }> = {
       in_progress: {
-        label: "In Progress",
+        label: "En cours",
         className: "bg-primary/20 text-primary border-primary/30",
       },
       completed: {
-        label: "Completed",
+        label: "Terminé",
         className: "bg-green-500/20 text-green-400 border-green-500/30",
       },
       paused: {
-        label: "Paused",
+        label: "En pause",
         className: "bg-yellow-500/20 text-yellow-400 border-yellow-500/30",
       },
     };
@@ -70,9 +70,9 @@ function DashboardContent() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold">Dashboard</h1>
+        <h1 className="text-3xl font-bold">Tableau de bord</h1>
         <p className="mt-1.5 text-muted-foreground">
-          Welcome back! Here&apos;s an overview of your projects and clients.
+          Bon retour ! Voici un aperçu de vos projets et clients.
         </p>
       </div>
 
@@ -90,7 +90,7 @@ function DashboardContent() {
             <Card className="glass-card">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
-                  Total Projects
+                  Total de projets
                 </CardTitle>
                 <div className="rounded-lg bg-primary/10 p-2">
                   <FolderKanban className="h-4 w-4 text-primary" />
@@ -104,7 +104,7 @@ function DashboardContent() {
             <Card className="glass-card">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
-                  Active Projects
+                  Projets actifs
                 </CardTitle>
                 <div className="rounded-lg bg-primary/10 p-2">
                   <Clock className="h-4 w-4 text-primary" />
@@ -118,7 +118,7 @@ function DashboardContent() {
             <Card className="glass-card">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
-                  Completed
+                  Terminés
                 </CardTitle>
                 <div className="rounded-lg bg-green-500/10 p-2">
                   <TrendingUp className="h-4 w-4 text-green-400" />
@@ -132,7 +132,7 @@ function DashboardContent() {
             <Card className="glass-card">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
-                  Total Clients
+                  Total de clients
                 </CardTitle>
                 <div className="rounded-lg bg-primary/10 p-2">
                   <Users className="h-4 w-4 text-primary" />
@@ -152,12 +152,12 @@ function DashboardContent() {
         <Card className="glass-card">
           <CardHeader>
             <div className="flex items-center justify-between">
-              <CardTitle>Recent Projects</CardTitle>
+              <CardTitle>Projets récents</CardTitle>
               <Link
                 href="/projects"
                 className="flex items-center gap-1 text-sm font-medium text-primary hover:underline"
               >
-                View All
+                Voir tout
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
@@ -200,7 +200,7 @@ function DashboardContent() {
                         {getStatusBadge(project.status)}
                       </div>
                       <p className="mt-0.5 text-sm text-muted-foreground truncate">
-                        {project.clients?.name || "No client"}
+                        {project.clients?.name || "Aucun client"}
                       </p>
                       {project.created_at && (
                         <p className="mt-1 text-xs text-muted-foreground">
@@ -218,14 +218,14 @@ function DashboardContent() {
         {/* Project Overview */}
         <Card className="glass-card">
           <CardHeader>
-            <CardTitle>Project Overview</CardTitle>
+            <CardTitle>Vue d'ensemble des projets</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
             {/* Status Breakdown */}
             <div className="space-y-4">
               <div className="space-y-2">
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">In Progress</span>
+                  <span className="text-muted-foreground">En cours</span>
                   <span className="font-medium">{activeProjects}</span>
                 </div>
                 <div className="h-2 overflow-hidden rounded-full bg-muted">
@@ -243,7 +243,7 @@ function DashboardContent() {
 
               <div className="space-y-2">
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">Completed</span>
+                  <span className="text-muted-foreground">Terminés</span>
                   <span className="font-medium">{completedProjects}</span>
                 </div>
                 <div className="h-2 overflow-hidden rounded-full bg-muted">
@@ -261,7 +261,7 @@ function DashboardContent() {
 
               <div className="space-y-2">
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">Paused</span>
+                  <span className="text-muted-foreground">En pause</span>
                   <span className="font-medium">{pausedProjects}</span>
                 </div>
                 <div className="h-2 overflow-hidden rounded-full bg-muted">
@@ -281,7 +281,7 @@ function DashboardContent() {
             {/* Total Budget */}
             <div className="border-t border-border pt-6">
               <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">Total Budget</p>
+                <p className="text-sm text-muted-foreground">Budget total</p>
                 <p className="text-3xl font-bold text-primary">
                   {new Intl.NumberFormat("fr-FR", {
                     style: "currency",
