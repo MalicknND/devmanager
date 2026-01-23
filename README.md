@@ -368,6 +368,7 @@ Le projet peut être déployé sur n'importe quelle plateforme supportant Next.j
 - [`GOOGLE_OAUTH_SETUP.md`](./GOOGLE_OAUTH_SETUP.md) - Configuration Google OAuth
 - [`EMAIL_VERIFICATION.md`](./EMAIL_VERIFICATION.md) - Configuration vérification email
 - [`SUPABASE_DELETE_ACCOUNT.md`](./SUPABASE_DELETE_ACCOUNT.md) - Configuration suppression de compte
+- [`SUPABASE_EMAIL_TEMPLATES.md`](./SUPABASE_EMAIL_TEMPLATES.md) - Personnalisation des emails Supabase
 
 ## 🛠️ Scripts disponibles
 
