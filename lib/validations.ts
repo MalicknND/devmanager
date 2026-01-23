@@ -53,3 +53,11 @@ export const registerSchema = z.object({
 })
 
 export type RegisterFormData = z.infer<typeof registerSchema>
+
+// Validation pour le profil
+export const profileSchema = z.object({
+  full_name: z.string().min(2, 'Le nom doit contenir au moins 2 caractères').max(100),
+  avatar_url: z.string().url('URL invalide').optional().or(z.literal('')),
+})
+
+export type ProfileFormData = z.infer<typeof profileSchema>
