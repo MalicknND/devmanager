@@ -5,7 +5,9 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Separator } from '@/components/ui/separator'
 import { LoginForm } from '@/components/forms/login-form'
+import { GoogleButton } from '@/components/auth/google-button'
 import { toast } from 'sonner'
 import type { LoginFormData } from '@/lib/validations'
 
@@ -71,7 +73,16 @@ export default function LoginPage() {
             Entrez vos identifiants pour accéder à votre compte
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-4">
+          <GoogleButton />
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <Separator />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-background px-2 text-muted-foreground">Ou continuer avec</span>
+            </div>
+          </div>
           <LoginForm onSubmit={handleSubmit} isLoading={loading} />
           <div className="mt-4 text-center text-sm">
             <span className="text-muted-foreground">Pas encore de compte ? </span>
