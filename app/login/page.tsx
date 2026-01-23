@@ -18,12 +18,36 @@ export default function LoginPage() {
     setLoading(true)
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data: signInData, error } = await supabase.auth.signInWithPassword({
         email: data.email,
         password: data.password,
       })
 
-      if (error) throw error
+      if (error) {
+        // Vérifier si l'erreur est due à un email non vérifié
+        if (error.message.includes('Email not confirmed') || error.message.includes('email_not_confirmed')) {
+          toast.error('Email non vérifié', {
+            description: 'Veuillez vérifier votre email avant de vous connecter',
+            duration: 5000,
+          })
+          // Rediriger vers la page de vérification
+          localStorage.setItem('pending_verification_email', data.email)
+          router.push(`/verify-email?email=${encodeURIComponent(data.email)}`)
+          return
+        }
+        throw error
+      }
+
+      // Vérifier si l'utilisateur a vérifié son email
+      if (signInData.user && !signInData.user.email_confirmed_at) {
+        toast.error('Email non vérifié', {
+          description: 'Veuillez vérifier votre email avant de vous connecter',
+          duration: 5000,
+        })
+        localStorage.setItem('pending_verification_email', data.email)
+        router.push(`/verify-email?email=${encodeURIComponent(data.email)}`)
+        return
+      }
 
       toast.success('Connexion réussie')
       router.push('/dashboard')

@@ -18,10 +18,11 @@ export default function RegisterPage() {
     setLoading(true)
 
     try {
-      const { error: signUpError } = await supabase.auth.signUp({
+      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
         email: data.email,
         password: data.password,
         options: {
+          emailRedirectTo: `${window.location.origin}/api/auth/callback?next=/verify-email`,
           data: {
             full_name: data.fullName,
           },
@@ -30,10 +31,26 @@ export default function RegisterPage() {
 
       if (signUpError) throw signUpError
 
-      toast.success('Compte créé avec succès')
-      // Le trigger Supabase créera automatiquement le profil
-      router.push('/dashboard')
-      router.refresh()
+      // Stocker l'email pour la page de vérification
+      if (signUpData.user) {
+        localStorage.setItem('pending_verification_email', data.email)
+      }
+
+      // Vérifier si l'email nécessite une confirmation
+      // Par défaut, Supabase envoie un email de vérification
+      // Si l'utilisateur n'a pas de session, c'est qu'il doit vérifier son email
+      if (signUpData.user && !signUpData.session) {
+        toast.success('Compte créé ! Vérifiez votre email', {
+          description: 'Un email de vérification a été envoyé à votre adresse',
+          duration: 5000,
+        })
+        router.push(`/verify-email?email=${encodeURIComponent(data.email)}`)
+      } else {
+        // Si une session est créée (email confirmé automatiquement ou désactivé)
+        toast.success('Compte créé avec succès')
+        router.push('/dashboard')
+        router.refresh()
+      }
     } catch (error: any) {
       const errorMessage = error.message || 'Une erreur est survenue'
       toast.error('Erreur lors de l\'inscription', {

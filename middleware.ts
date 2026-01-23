@@ -42,15 +42,17 @@ export async function middleware(request: NextRequest) {
     request.nextUrl.pathname.startsWith(route),
   );
 
-  // Routes d'authentification
-  const authRoutes = ["/login", "/register"];
+  // Routes d'authentification (accessibles sans être connecté)
+  const authRoutes = ["/login", "/register", "/verify-email"];
   const isAuthRoute = authRoutes.includes(request.nextUrl.pathname);
 
   if (isProtectedRoute && !user) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
-  if (isAuthRoute && user) {
+  // Rediriger les utilisateurs connectés depuis les routes auth vers le dashboard
+  // Sauf pour verify-email qui peut être accessible même si connecté
+  if (isAuthRoute && user && request.nextUrl.pathname !== "/verify-email") {
     return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 
