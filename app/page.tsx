@@ -1,6 +1,6 @@
-import Link from 'next/link'
-import { Button } from '@/components/ui/button'
-import { ArrowRight, CheckCircle2, FolderKanban, Users, TrendingUp } from 'lucide-react'
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { ArrowRight, FolderKanban, Users, TrendingUp } from "lucide-react";
 
 export default function Home() {
   return (
@@ -10,15 +10,17 @@ export default function Home() {
         <div className="container mx-auto px-4 py-24 sm:py-32">
           <div className="mx-auto max-w-4xl text-center">
             <h1 className="text-5xl font-bold tracking-tight sm:text-6xl lg:text-7xl">
-              <span className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+              <span className="bg-linear-to-r from-primary to-primary/60 bg-clip-text text-transparent">
                 DevManager
               </span>
               <br />
-              <span className="text-foreground">Gérez vos projets freelance</span>
+              <span className="text-foreground">
+                Gérez vos projets freelance
+              </span>
             </h1>
             <p className="mt-6 text-lg leading-8 text-muted-foreground sm:text-xl">
-              L'outil tout-en-un pour gérer vos clients, projets et budgets.
-              Simple, moderne et puissant.
+              L&apos;outil tout-en-un pour gérer vos clients, projets et
+              budgets. Simple, moderne et puissant.
             </p>
             <div className="mt-10 flex items-center justify-center gap-4">
               <Button asChild size="lg" className="text-base">
@@ -34,7 +36,7 @@ export default function Home() {
           </div>
         </div>
         {/* Gradient decoration */}
-        <div className="absolute inset-x-0 top-0 -z-10 h-full bg-gradient-to-b from-primary/5 via-transparent to-transparent" />
+        <div className="absolute inset-x-0 top-0 -z-10 h-full bg-linear-to-r from-primary/5 via-transparent to-transparent" />
       </section>
 
       {/* Features Section */}
@@ -58,7 +60,9 @@ export default function Home() {
                 <feature.icon className="h-6 w-6 text-primary" />
               </div>
               <h3 className="text-xl font-semibold">{feature.name}</h3>
-              <p className="mt-2 text-sm text-muted-foreground">{feature.description}</p>
+              <p className="mt-2 text-sm text-muted-foreground">
+                {feature.description}
+              </p>
             </div>
           ))}
         </div>
@@ -72,7 +76,8 @@ export default function Home() {
               Prêt à démarrer ?
             </h2>
             <p className="mt-4 text-lg text-muted-foreground">
-              Rejoignez les développeurs freelance qui font confiance à DevManager
+              Rejoignez les développeurs freelance qui font confiance à
+              DevManager
             </p>
             <Button asChild size="lg" className="mt-8 text-base">
               <Link href="/register">
@@ -84,23 +89,25 @@ export default function Home() {
         </div>
       </section>
     </div>
-  )
+  );
 }
 
 const features = [
   {
-    name: 'Gestion de clients',
-    description: 'Centralisez toutes les informations de vos clients en un seul endroit.',
+    name: "Gestion de clients",
+    description:
+      "Centralisez toutes les informations de vos clients en un seul endroit.",
     icon: Users,
   },
   {
-    name: 'Suivi de projets',
-    description: 'Suivez l\'avancement de vos projets avec des statuts clairs et des deadlines.',
+    name: "Suivi de projets",
+    description:
+      "Suivez l'avancement de vos projets avec des statuts clairs et des deadlines.",
     icon: FolderKanban,
   },
   {
-    name: 'Gestion budgétaire',
-    description: 'Tenez compte de vos budgets et revenus pour chaque projet.',
+    name: "Gestion budgétaire",
+    description: "Tenez compte de vos budgets et revenus pour chaque projet.",
     icon: TrendingUp,
   },
-]
+];
