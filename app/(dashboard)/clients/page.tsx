@@ -1,8 +1,6 @@
 'use client'
 
 import { useState, useMemo, useEffect } from 'react'
-import { ProtectedRoute } from '@/components/auth/ProtectedRoute'
-import { AppLayout } from '@/components/layout/AppLayout'
 import {
   useClients,
   useCreateClient,
@@ -36,7 +34,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
-import { TableSkeleton, LoadingSpinner } from '@/components/ui/loading'
+import { TableSkeleton } from '@/components/ui/loading'
 import { Plus, Search, Edit, Trash2, Mail, Phone, Building, Loader2 } from 'lucide-react'
 
 function ClientsContent() {
@@ -107,9 +105,8 @@ function ClientsContent() {
   }
 
   return (
-    <AppLayout>
-      <div className="space-y-8">
-        <div className="flex items-center justify-between">
+    <div className="space-y-8">
+      <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold">Clients</h1>
             <p className="mt-2 text-muted-foreground">
@@ -153,10 +150,10 @@ function ClientsContent() {
               />
             </DialogContent>
           </Dialog>
-        </div>
+      </div>
 
-        {/* Search */}
-        <div className="relative">
+      {/* Search */}
+      <div className="relative">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             placeholder="Rechercher un client..."
@@ -164,9 +161,9 @@ function ClientsContent() {
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-10"
           />
-        </div>
+      </div>
 
-        {/* Clients Grid */}
+      {/* Clients Grid */}
         {isLoading ? (
           <TableSkeleton rows={6} />
         ) : filteredClients.length === 0 ? (
@@ -270,15 +267,8 @@ function ClientsContent() {
             )}
           </>
         )}
-      </div>
-    </AppLayout>
+    </div>
   )
 }
 
-export default function ClientsPage() {
-  return (
-    <ProtectedRoute>
-      <ClientsContent />
-    </ProtectedRoute>
-  )
-}
+export default ClientsContent

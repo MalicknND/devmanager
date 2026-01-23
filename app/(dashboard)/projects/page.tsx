@@ -1,8 +1,6 @@
 'use client'
 
 import { useState, useMemo, useEffect } from 'react'
-import { ProtectedRoute } from '@/components/auth/ProtectedRoute'
-import { AppLayout } from '@/components/layout/AppLayout'
 import {
   useProjects,
   useCreateProject,
@@ -46,7 +44,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
-import { TableSkeleton, LoadingSpinner } from '@/components/ui/loading'
+import { TableSkeleton } from '@/components/ui/loading'
 import { Plus, Search, Edit, Trash2, Filter, Loader2 } from 'lucide-react'
 import { format } from 'date-fns'
 import { fr } from 'date-fns/locale/fr'
@@ -148,9 +146,8 @@ function ProjectsContent() {
   }
 
   return (
-    <AppLayout>
-      <div className="space-y-8">
-        <div className="flex items-center justify-between">
+    <div className="space-y-8">
+      <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold">Projets</h1>
             <p className="mt-2 text-muted-foreground">
@@ -202,10 +199,10 @@ function ProjectsContent() {
               )}
             </DialogContent>
           </Dialog>
-        </div>
+      </div>
 
-        {/* Filters */}
-        <div className="flex gap-4">
+      {/* Filters */}
+      <div className="flex gap-4">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
@@ -230,9 +227,9 @@ function ProjectsContent() {
               <SelectItem value="paused">En pause</SelectItem>
             </SelectContent>
           </Select>
-        </div>
+      </div>
 
-        {/* Projects Grid */}
+      {/* Projects Grid */}
         {isLoading ? (
           <TableSkeleton rows={6} />
         ) : filteredProjects.length === 0 ? (
@@ -348,15 +345,8 @@ function ProjectsContent() {
             )}
           </>
         )}
-      </div>
-    </AppLayout>
+    </div>
   )
 }
 
-export default function ProjectsPage() {
-  return (
-    <ProtectedRoute>
-      <ProjectsContent />
-    </ProtectedRoute>
-  )
-}
+export default ProjectsContent

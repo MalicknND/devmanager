@@ -1,13 +1,5 @@
 import { Skeleton } from '@/components/ui/skeleton'
 
-export function LoadingSpinner({ className }: { className?: string }) {
-  return (
-    <div className={`flex items-center justify-center ${className}`}>
-      <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-    </div>
-  )
-}
-
 export function CardSkeleton() {
   return (
     <div className="glass-card rounded-xl p-6 space-y-4">
