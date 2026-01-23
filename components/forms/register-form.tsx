@@ -1,11 +1,11 @@
-'use client'
+"use client";
 
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { registerSchema, type RegisterFormData } from '@/lib/validations'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Loader2 } from 'lucide-react'
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { registerSchema, type RegisterFormData } from "@/lib/validations";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Loader2 } from "lucide-react";
 import {
   Form,
   FormControl,
@@ -13,22 +13,22 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form'
+} from "@/components/ui/form";
 
 interface RegisterFormProps {
-  onSubmit: (data: RegisterFormData) => Promise<void>
-  isLoading?: boolean
+  onSubmit: (data: RegisterFormData) => Promise<void>;
+  isLoading?: boolean;
 }
 
 export function RegisterForm({ onSubmit, isLoading }: RegisterFormProps) {
   const form = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
-      fullName: '',
-      email: '',
-      password: '',
+      fullName: "",
+      email: "",
+      password: "",
     },
-  })
+  });
 
   return (
     <Form {...form}>
@@ -77,9 +77,9 @@ export function RegisterForm({ onSubmit, isLoading }: RegisterFormProps) {
 
         <Button type="submit" className="w-full" disabled={isLoading}>
           {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          {isLoading ? 'Création...' : 'Créer mon compte'}
+          {isLoading ? "Création..." : "Créer mon compte"}
         </Button>
       </form>
     </Form>
-  )
+  );
 }

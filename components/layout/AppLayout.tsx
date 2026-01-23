@@ -1,6 +1,6 @@
-'use client'
+"use client";
 
-import { Sidebar } from './Sidebar'
+import { Sidebar } from "./Sidebar";
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -10,5 +10,5 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
         <div className="container mx-auto p-6 lg:p-8">{children}</div>
       </main>
     </div>
-  )
+  );
 }
