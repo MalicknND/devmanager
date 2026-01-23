@@ -9,6 +9,24 @@ DevManager est une application complète et moderne qui permet aux développeurs
 ![Supabase](https://img.shields.io/badge/Supabase-Latest-green?style=flat-square&logo=supabase)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind-4-38bdf8?style=flat-square&logo=tailwind-css)
 
+## 📸 Aperçu de l'application
+
+### Tableau de bord
+![Tableau de bord](docs/images/dashboard.png)
+*Vue d'ensemble avec statistiques, projets récents et budget total*
+
+### Gestion des clients
+![Gestion des clients](docs/images/clients.png)
+*Interface de gestion complète des clients avec recherche et actions rapides*
+
+### Gestion des projets
+![Gestion des projets](docs/images/projects.png)
+*Vue en grille des projets avec filtres par statut et recherche*
+
+### Paramètres
+![Paramètres](docs/images/settings.png)
+*Gestion du profil, informations du compte et zone de danger*
+
 ## ✨ Fonctionnalités principales
 
 ### 🔐 Authentification complète
@@ -20,14 +38,19 @@ DevManager est une application complète et moderne qui permet aux développeurs
 - ✅ **Protection côté client et serveur** (défense en profondeur)
 
 ### 📊 Dashboard
+![Tableau de bord](docs/images/dashboard.png)
+
 - 📈 **Statistiques en temps réel** :
   - Nombre total de clients
   - Projets actifs et terminés
   - Budget total de tous les projets
 - 📋 **Liste des projets récents** avec aperçu rapide
 - 🎨 **Interface moderne** avec cartes glassmorphism
+- 📊 **Vue d'ensemble des projets** avec barres de progression par statut
 
 ### 👥 Gestion des clients
+![Gestion des clients](docs/images/clients.png)
+
 - ➕ **CRUD complet** (Créer, Lire, Modifier, Supprimer)
 - 🔍 **Recherche en temps réel** par nom, email, entreprise
 - 📝 **Informations complètes** :
@@ -38,8 +61,11 @@ DevManager est une application complète et moderne qui permet aux développeurs
   - Notes personnalisées
 - 🗑️ **Suppression avec confirmation** (AlertDialog)
 - 📄 **Pagination** pour grandes listes
+- 🎨 **Cartes visuelles** avec icônes pour chaque type d'information
 
 ### 📁 Gestion des projets
+![Gestion des projets](docs/images/projects.png)
+
 - ➕ **CRUD complet** avec validation
 - 🏷️ **Filtres par statut** :
   - En cours (`in_progress`)
@@ -50,8 +76,11 @@ DevManager est une application complète et moderne qui permet aux développeurs
 - 🎨 **Badges de statut colorés**
 - 🔍 **Recherche** par nom ou description
 - 📄 **Pagination** intégrée
+- 📅 **Affichage des dates** formatées en français
 
 ### ⚙️ Paramètres et profil
+![Paramètres](docs/images/settings.png)
+
 - 👤 **Modification du profil** :
   - Nom complet
   - Avatar (URL d'image)
@@ -59,6 +88,7 @@ DevManager est une application complète et moderne qui permet aux développeurs
 - 📧 **Informations du compte** (email, ID utilisateur)
 - 🗑️ **Suppression de compte** avec confirmation sécurisée
 - ⚠️ **Zone de danger** clairement identifiée
+- 🔒 **Sécurité renforcée** avec double confirmation
 
 ### 🎨 Design moderne
 - 🌙 **Thème sombre "Bold & Modern"** inspiré Vercel/GitHub
